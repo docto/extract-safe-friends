@@ -4,7 +4,7 @@ chrome.extension.sendMessage({}, function(response) {
 		clearInterval(readyStateCheckInterval);
 
 		const MESSAGE_BOX_ID = "PRenPie";
-		const LOAD_WAIT_TIME = 1000 // Could be more. 
+		const LOAD_WAIT_TIME = 1500 // Could be more. 
 
 		createMessageBox();
 		
@@ -39,22 +39,46 @@ chrome.extension.sendMessage({}, function(response) {
 					var current_user = visible_users[i];
 					var safe_when = current_user.parentElement.parentElement.childNodes[2].textContent;
 					
-					var user = { 
-						name: current_user.text,
-						safe: safe_when
-					}
+					// Split Name into First & Last Name(s). Assume first word is name
+					var user = fullNameToObject(current_user.text)
+					user.safe= safe_when
 	
 					all_safe_users.push(user)
 				}
 	
-				updateMessageBox("Done");
-				console.log("\n\n");
-				console.log(JSON.stringify(all_safe_users))
+				updateMessageBox("Downloading CSV...");
+				downloadCSV({filename: "safe-friends.csv"})
 			} else {
 				updateMessageBox("No safe friends found");				
 			}
+		}
 
-			
+		function fullNameToObject(full_name){
+			var full_name = full_name.split(" ");
+			var final_object = {}
+
+			switch (full_name.length) {
+				case 1:
+					final_object.name = full_name[1]
+				break;
+				case 2:
+					final_object = {
+						nombre: full_name[0],
+						apellido: full_name[1]
+					}
+				break;
+				default: 
+					final_object = {
+						nombre: full_name[0],
+						apellido: ""
+					}
+
+					for(var i = 1, all = full_name.length; i < all; i++) {
+						final_object.apellido += full_name[i] + " "
+					}
+			}
+
+			return final_object
 		}
 
 		function createMessageBox(){
@@ -68,6 +92,57 @@ chrome.extension.sendMessage({}, function(response) {
 
 		function updateMessageBox(text){
 			document.getElementById(MESSAGE_BOX_ID).innerHTML = text
+		}
+		
+		function convertArrayOfObjectsToCSV(args) {  
+			var result, ctr, keys, columnDelimiter, lineDelimiter, data;
+	
+			data = args.data || null;
+			if (data == null || !data.length) {
+				return null;
+			}
+	
+			columnDelimiter = args.columnDelimiter || ',';
+			lineDelimiter = args.lineDelimiter || '\n';
+	
+			keys = Object.keys(data[0]);
+	
+			result = '';
+			result += keys.join(columnDelimiter);
+			result += lineDelimiter;
+	
+			data.forEach(function(item) {
+				ctr = 0;
+				keys.forEach(function(key) {
+					if (ctr > 0) result += columnDelimiter;
+	
+					result += item[key];
+					ctr++;
+				});
+				result += lineDelimiter;
+			});
+	
+			return result;
+		}
+
+		function downloadCSV(args) {  
+			var data, filename, link;
+			var csv = convertArrayOfObjectsToCSV({
+				data: all_safe_users
+			});
+			if (csv == null) return;
+	
+			filename = args.filename || 'export.csv';
+	
+			if (!csv.match(/^data:text\/csv/i)) {
+				csv = 'data:text/csv;charset=utf-8,' + csv;
+			}
+			data = encodeURI(csv);
+	
+			link = document.createElement('a');
+			link.setAttribute('href', data);
+			link.setAttribute('download', filename);
+			link.click();
 		}
 
 	}
