@@ -1,6 +1,6 @@
 # Installing the extension Google Chrome
 * Clone or [Download](https://github.com/docto/extract-safe-friends/archive/master.zip) repo to your computer. (Remember to extract the zip file if you download)
-* Visit chrome://extensions (via omnibox or menu -> Tools -> Extensions).
+* Visit chrome://extensions (via omnibox or menu -> More Tools -> Extensions).
 * Enable **Developer mode** by clicking the checkbox in the upper-right corner.
 * Click on the "Load unpacked extension..." button.
 * Search for the repo folder containing the unpacked extension. 
