@@ -1,0 +1,23 @@
+{
+  "name": "PR Maria extract safe friends",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "description": "Extract list to JS object",
+  "homepage_url": "https://github.com/docto/extract-safe-friends",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "default_locale": "en",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.facebook.com/safetycheck/hurricane-maria-sep17-2017/friends/"
+      ],
+      "js": [
+        "src/inject/inject.js"
+      ]
+    }
+  ]
+}
